@@ -13,3 +13,5 @@
 - 별도의 소스코드 수정 없이 간편하게 관리 대상을 추가/제거 가능.
 - CPU / RAM / 저장장치 사용률과 응용 어플리케이션(WAS, 웹서버 등)의 status를 실시간으로 관리.
 - server에서 제공하는 web을 통해 상황 모니터링이 가능하고, 결과를 csv 파일로 제공받을 수 있음.
+![health_1](https://github.com/jungsungwook/easy-healthchecker/assets/20926860/21c92f38-94c6-4b32-9c26-daf51557693d)
+![health_2](https://github.com/jungsungwook/easy-healthchecker/assets/20926860/15a23a8a-8d2c-40d5-8520-99c1cc177868)
