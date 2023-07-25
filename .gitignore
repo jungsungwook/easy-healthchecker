@@ -1,4 +1,4 @@
-*.env
+.env
 dbinfo.json
 dbinfo.csv
 serverinfo.json
