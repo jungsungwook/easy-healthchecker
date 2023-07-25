@@ -1,0 +1,12 @@
+{
+    "serverpc1":{
+        "ip":"123.456.789.012",
+        "port":1234,
+        "user":"userName"
+    },
+    "serverpc2":{
+        "ip":"123.456.789.013",
+        "port":1234,
+        "user":"userName"
+    }
+}

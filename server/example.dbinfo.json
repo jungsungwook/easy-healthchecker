@@ -1,0 +1,22 @@
+{
+    "DB1": {
+        "DATABASE_TYPE": "oracle",
+        "DATABASE_HOST": "db1.domain.com",
+        "DATABASE_PORT": "1234",
+        "DATABASE_NAME": "DB1",
+        "DATABASE_USER": "SYS",
+        "DATABASE_PASSWORD": "YOUR_PASSWORD",
+        "DATABASE_SID": "DB1",
+        "DATABASE_ROLE": "SYSDBA"
+    },
+    "DB2": {
+        "DATABASE_TYPE": "oracle",
+        "DATABASE_HOST": "1234.5678.9012.3456",
+        "DATABASE_PORT": "1234",
+        "DATABASE_NAME": "DB2",
+        "DATABASE_USER": "sys",
+        "DATABASE_PASSWORD": "YOUR_PASSWORD",
+        "DATABASE_SID": "DB2",
+        "DATABASE_ROLE": "SYSDBA"
+    }
+}

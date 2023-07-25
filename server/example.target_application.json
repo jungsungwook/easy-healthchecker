@@ -1,0 +1,18 @@
+{
+    "serverpc1": [
+        {
+            "port": 8080,
+            "service_name": "웹서버"
+        }
+    ],
+    "serverpc2": [
+        {
+            "port": 6060,
+            "service_name": "크롤러"
+        },
+        {
+            "port": 7070,
+            "service_name": "DB서버"
+        }
+    ]
+}
