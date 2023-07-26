@@ -5,3 +5,6 @@ serverinfo.json
 servers.csv
 target_application.json
 target_db.json
+__pycache__
+logs
+upload

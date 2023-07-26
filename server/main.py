@@ -155,6 +155,33 @@ def mainpage():
         html += "<br><br>"
     # return_data를 html에서 표로 보여줌
     html += "<h1>DB Status</h1>"
+    # logs/db 경로 안의 모든 폴더를 가져오고 그 안의 log_*.json 파일을 가져온다.
+    db_list = os.listdir("logs/db")
+    for db in db_list:
+        db_logs = os.listdir("logs/db/"+db)
+        db_logs.sort()
+        db_info = json.load(
+            open("logs/db/"+db+"/"+db_logs[-1], "r", encoding="utf8"))
+        html += "<table border=1>"
+        html += "<tr>"
+        html += "<th>DB 명</th>"
+        html += "<th>인스턴스 명</th>"
+        html += "<th>Status</th>"
+        html += "<th>업타임</th>"
+        html += "</tr><tr>"
+        html += "<td>"+str(db)+"</td>"
+        html += "<td>"+str(db_info["instance_name"])+"</td>"
+        if(db_info["status"] == "OPEN" and db_info["database_status"] == "ACTIVE"):
+            html += "<td style='background:green;'></td>"
+        else:
+            html += "<td style='background:red;'></td>"
+        uptime = str(db_logs[-1].split(".")[0].split("_")[1])
+        uptime = uptime[0:4]+"-"+uptime[4:6]+"-"+uptime[6:8]+" "+uptime[8:10] + \
+            ":"+uptime[10:12]+":"+uptime[12:14]
+        html += "<td>"+uptime+"</td></tr>"
+        html += "</table>"
+        html += "<br>"
+
     html += "<a href='/download/db'>DB 정보 다운로드</a><br><br>"
     html += "<table border=1>"
     html += "<tr>"
@@ -449,11 +476,51 @@ def download(type: str):
     elif type == "db":
         return FileResponse("./dbinfo.csv")
 # 1시간 간격으로 실행
+def check_oracle_status(key, value):
+    import cx_Oracle
+    try:
+        connection = connect_db(key)
+        if(connection == None):
+            if not os.path.isdir("logs/db/"+key):
+                os.mkdir("logs/db/"+key)
+            with open("logs/db/"+key+"/log_"+str(datetime.datetime.now().strftime("%Y%m%d%H%M%S"))+".json", "x", encoding="utf8") as f:
+                json.dump({"instance_name": value["DATABASE_SID"], "status": "None", "database_status": "None"}, f, ensure_ascii=False)
+            return
+        # 상태 정보 가져오기
+        cursor = connection.cursor()
+        cursor.execute('SELECT instance_name, status, database_status FROM v$instance')
+        result = cursor.fetchone()
 
+        # 결과 출력
+        if result:
+            instance_name, status, database_status = result
+            if not os.path.isdir("logs/db/"+key):
+                os.mkdir("logs/db/"+key)
+            with open("logs/db/"+key+"/log_"+str(datetime.datetime.now().strftime("%Y%m%d%H%M%S"))+".json", "x", encoding="utf8") as f:
+                json.dump({"instance_name": instance_name, "status": status, "database_status": database_status}, f, ensure_ascii=False)
+        else:
+            with open("logs/db/"+key+"/log_"+str(datetime.datetime.now().strftime("%Y%m%d%H%M%S"))+".json", "x", encoding="utf8") as f:
+                json.dump({"instance_name": value["DATABASE_SID"], "status": "None", "database_status": "None"}, f, ensure_ascii=False)
+            print("No data available.")
+        
+        # 연결 종료
+        cursor.close()
+        connection.close()
+
+    except cx_Oracle.Error as error:
+        with open("logs/db/"+key+"/log_"+str(datetime.datetime.now().strftime("%Y%m%d%H%M%S"))+".json", "x", encoding="utf8") as f:
+            json.dump({"instance_name": value["DATABASE_SID"], "status": "None", "database_status": "None"}, f, ensure_ascii=False)
+        print("Error connecting to Oracle Database:", error)
+        return
 
 @scheduler.scheduled_job('interval', seconds=3600)
 def interval_task():
     logs_data = []
+    for key, value in dbinfo.items():
+        if(key == "DEVDB19C"):
+            continue
+        if(value["DATABASE_TYPE"] == "oracle"):
+            check_oracle_status(key, value)
     # with open("logs/log_"+str(datetime.datetime.now().strftime("%Y%m%d%H%M%S"))+".json", "w", encoding="utf8") as f:
     #     json.dump(logs_data, f)
     # print("# [Auto Save] log_"+str(datetime.datetime.now().strftime("%Y%m%d%H%M%S"))+".json")
