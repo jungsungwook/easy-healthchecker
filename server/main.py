@@ -524,3 +524,21 @@ def interval_task():
     # with open("logs/log_"+str(datetime.datetime.now().strftime("%Y%m%d%H%M%S"))+".json", "w", encoding="utf8") as f:
     #     json.dump(logs_data, f)
     # print("# [Auto Save] log_"+str(datetime.datetime.now().strftime("%Y%m%d%H%M%S"))+".json")
+
+@scheduler.scheduled_job('interval', seconds=10)
+def clean_log():
+    # 최신 로그 10개만 남기기
+    for key, value in dbinfo.items():
+        if(key == "DEVDB19C"):
+            continue
+        if(value["DATABASE_TYPE"] == "oracle"):
+            log_list = os.listdir("logs/db/"+key)
+            log_list.sort()
+            for i in range(len(log_list) - 10):
+                os.remove("logs/db/"+key+"/"+log_list[i])
+                
+    for key in serverinfo.keys():
+        log_list = os.listdir("logs/"+key)
+        log_list.sort()
+        for i in range(len(log_list) - 10):
+            os.remove("logs/"+key+"/"+log_list[i])
