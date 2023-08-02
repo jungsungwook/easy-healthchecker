@@ -136,9 +136,10 @@ def mainpage():
         html += "<th>status</th></tr>"
         alreadyPort = []
         tcplist = info["tcp4"]
-        for tcp in tcplist:
-            targetList = target_application_name_space[server["user"]]
-            for target in targetList:
+        targetList = target_application_name_space[server["user"]]
+        for target in targetList:
+            findport = False
+            for tcp in tcplist:
                 if tcp["port"] == target["port"]:
                     if tcp["port"] in alreadyPort:
                         continue
@@ -149,7 +150,15 @@ def mainpage():
                     html += "<td>"+str(tcp["name"])+"</td>"
                     html += "<td style='background:green;'></td>" if str(tcp["status"]) == "running" else "<td style='background:red;'></td>"
                     alreadyPort.append(tcp["port"])
+                    findport = True
                     break
+            if not findport:
+                html += "<tr>"
+                html += "<td>"+str(target["port"])+"</td>"
+                html += "<td>None</td>"
+                html += "<td>"+str(target["service_name"])+"</td>"
+                html += "<td>None</td>"
+                html += "<td style='background:red;'></td>"
             html += "</tr>"
         html += "</table>"
         html += "<br><br>"
