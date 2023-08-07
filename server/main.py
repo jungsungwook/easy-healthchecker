@@ -219,10 +219,16 @@ def mainpage():
         # else:
         #     html += "업타입 : <span style='color:green'>●</span>&nbsp;&nbsp;&nbsp;"
         # 수정일이 1시간이 지나면 빨간색 동그라미를 표시
-        if (datetime.datetime.now() - datetime.datetime.strptime(info["uptime"], "%Y/%m/%d %H:%M:%S")).seconds > 3600:
+        
+        nowtime = datetime.datetime.now()
+        uptime = datetime.datetime.strptime(info["uptime"], "%Y/%m/%d %H:%M:%S")
+        if (nowtime - uptime).days > 0:
             html += "업타입 : <span style='color:red'>●</span>&nbsp;&nbsp;&nbsp;"
         else:
-            html += "업타입 : <span style='color:green'>●</span>&nbsp;&nbsp;&nbsp;"
+            if (datetime.datetime.now() - datetime.datetime.strptime(info["uptime"], "%Y/%m/%d %H:%M:%S")).seconds > 3600:
+                html += "업타입 : <span style='color:orange'>●</span>&nbsp;&nbsp;&nbsp;"
+            else:
+                html += "업타입 : <span style='color:green'>●</span>&nbsp;&nbsp;&nbsp;"
 
         # 디스크 사용률이 90% 이상이면 빨간색 동그라미를 표시
         for hdd in info["hdd"]:
@@ -521,6 +527,16 @@ def check_oracle_status(key, value):
             json.dump({"instance_name": value["DATABASE_SID"], "status": "None", "database_status": "None"}, f, ensure_ascii=False)
         print("Error connecting to Oracle Database:", error)
         return
+
+@app.get('/reload/{type}')
+def reload(type: str):
+    if(type == "db"):
+        for key, value in dbinfo.items():
+            if(key == "DEVDB19C"):
+                continue
+            if(value["DATABASE_TYPE"] == "oracle"):
+                check_oracle_status(key, value)
+        return {"result": "success"}
 
 @scheduler.scheduled_job('interval', seconds=3600)
 def interval_task():
